@@ -1,0 +1,40 @@
+#!../usr/bin/bash
+echo -e "${NOCOLOR}Checking Required packages${NOCOLOR}"
+packages=("zstd" "curl" "openssl" "libzip")
+for pkg in ${packages[@]}; do
+is_pkg_installed=$(dpkg-query -W --showformat='${Status}
+' ${pkg} | grep "install ok installed")
+if [ "${is_pkg_installed}" == "install ok installed" ]; then
+echo -e ${GREEN}${pkg}${NOCOLOR} is installed.
+else [ "" = "${is_pkg_installed}" ];
+echo -e "${RED}No ${pkg}. Setting up ${pkg}.${NOCOLOR}"
+pkg install ${pkg} -y
+fi
+done
+merpro=$EXTERNAL_STORAGE/Download/DRAGON_PAK/DRAGON_PAK
+locbin=$PREFIX/bin
+
+#make dir
+mkdir /data/data/com.termux/files/home/DRAGON_PAK/
+mkdir /data/data/com.termux/files/home/DRAGON_PAK/Unpacked/
+mkdir /data/data/com.termux/files/home/DRAGON_PAK/Edit_Uasset/
+mkdir /data/data/com.termux/files/home/DRAGON_PAK/Repaked/
+
+if [[ -f "$merpro" ]]
+then
+cp -rf $merpro $locbin
+chmod +x $locbin/DRAGON_PAK
+DIR="$EXTERNAL_STORAGE/Download/DRAGON_PAK/"
+
+# Check if the directory exists
+if [ -d "$DIR" ]; then
+    rm -r "$DIR"
+    echo ""
+else
+    echo ""
+fi
+DRAGON_PAK
+else
+echo "No DRAGON_PAK file in Download directory"
+echo "File Past The Download Folder"
+fi
