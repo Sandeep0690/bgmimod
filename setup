@@ -2,39 +2,44 @@
 echo -e "${NOCOLOR}Checking Required packages${NOCOLOR}"
 packages=("zstd" "curl" "openssl" "libzip")
 for pkg in ${packages[@]}; do
-is_pkg_installed=$(dpkg-query -W --showformat='${Status}
-' ${pkg} | grep "install ok installed")
-if [ "${is_pkg_installed}" == "install ok installed" ]; then
-echo -e ${GREEN}${pkg}${NOCOLOR} is installed.
-else [ "" = "${is_pkg_installed}" ];
-echo -e "${RED}No ${pkg}. Setting up ${pkg}.${NOCOLOR}"
-pkg install ${pkg} -y
-fi
+    is_pkg_installed=$(dpkg-query -W --showformat='${Status}\n' ${pkg} 2>/dev/null | grep "install ok installed")
+    if [ "${is_pkg_installed}" == "install ok installed" ]; then
+        echo -e ${GREEN}${pkg}${NOCOLOR} is installed.
+    else
+        echo -e "${RED}No ${pkg}. Setting up ${pkg}.${NOCOLOR}"
+        pkg install ${pkg} -y
+    fi
 done
-merpro=$EXTERNAL_STORAGE/Download/DRAGON_PAK/DRAGON_PAK
+
 locbin=$PREFIX/bin
+home_dir=/data/data/com.termux/files/home/DRAGON_PAK
 
-#make dir
-mkdir /data/data/com.termux/files/home/DRAGON_PAK/
-mkdir /data/data/com.termux/files/home/DRAGON_PAK/Unpacked/
-mkdir /data/data/com.termux/files/home/DRAGON_PAK/Edit_Uasset/
-mkdir /data/data/com.termux/files/home/DRAGON_PAK/Repaked/
-
-if [[ -f "$merpro" ]]
-then
-cp -rf $merpro $locbin
-chmod +x $locbin/DRAGON_PAK
-DIR="$EXTERNAL_STORAGE/Download/DRAGON_PAK/"
-
-# Check if the directory exists
-if [ -d "$DIR" ]; then
-    rm -r "$DIR"
-    echo ""
-else
-    echo ""
+# If DRAGON_PAK exists as a file, remove it
+if [ -f "$home_dir" ]; then
+    rm -f "$home_dir"
 fi
-DRAGON_PAK
+
+# Make sure directories exist
+mkdir -p $home_dir/Unpacked
+mkdir -p $home_dir/Edit_Uasset
+mkdir -p $home_dir/Repacked
+
+# Look for the DRAGON_PAK file in Downloads
+download_dir=$EXTERNAL_STORAGE/Download
+merpro1=$download_dir/DRAGON_PAK/DRAGON_PAK   # original path
+merpro2=$download_dir/DRAGON_PAK              # direct file in Downloads
+
+if [[ -f "$merpro1" ]]; then
+    cp -rf "$merpro1" "$locbin"
+    chmod +x $locbin/DRAGON_PAK
+    rm -rf "$download_dir/DRAGON_PAK"
+    echo "Installed DRAGON_PAK from folder."
+elif [[ -f "$merpro2" ]]; then
+    cp -rf "$merpro2" "$locbin/DRAGON_PAK"
+    chmod +x $locbin/DRAGON_PAK
+    rm -f "$merpro2"
+    echo "Installed DRAGON_PAK from Downloads."
 else
-echo "No DRAGON_PAK file in Download directory"
-echo "File Past The Download Folder"
+    echo "No DRAGON_PAK file in Download directory"
+    echo "Place the DRAGON_PAK file in your Downloads folder."
 fi
